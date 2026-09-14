@@ -1,17 +1,16 @@
-# Maison — 3D marketing site
+# Maison — 3D marketing site & shop
 
-A design-only marketing experience for **Maison Cosmetic** (@maison.cosmetic) — a
-beauty house in Kurdistan/Iraq carrying its own *Maison Luxury Perfumes* line
+A design-only storefront for **Maison Cosmetic** (@maison.cosmetic) — a beauty
+house in Erbil, Kurdistan, carrying its own *Maison Luxury Perfumes* line
 alongside curated skincare, cosmetics and hair care.
 
 Static site. No backend, no database, no build step. Open `index.html`.
 
 **Live:** https://maison-cosmetic-ahmads-projects-3806fa63.vercel.app
 
-Deployed on Vercel from this branch (it is the repo's default branch, so Vercel
-treats it as production). Every push redeploys automatically. The GitHub repo is
-private; the deployed site is public — Vercel Authentication is turned off so the
-marketing page is reachable without a login.
+Deployed on Vercel from this branch (the repo's default, so Vercel treats it as
+production). Every push redeploys. The GitHub repo is private; the deployed site
+is public.
 
 ---
 
@@ -21,74 +20,104 @@ The visual system is derived from the brand's own posts, not invented:
 
 | Signal | Where it came from | How it is used |
 |---|---|---|
-| Vermillion red `#EE4028` + bone grey `#E4E1DC` | Their poster artwork — full-bleed split panels | Core palette, and the site's section rhythm |
-| **Vertical split panel**, product straddling the seam | Their recurring grid device | Hero plate, collection tiles, the whole 3D art direction |
-| Letterspaced high-contrast serif `MAISON` wordmark | Their `MAISON / LUXURY PERFUMES` and `MAISON / COSMETIC` lockups | Cormorant Garamond, `.3em` tracking |
-| Gold packaging accents | Their perfume caps and filigree | `--gold`, used only on the signature product |
-| Kurdish + Arabic + English copy | Their bilingual captions | Full trilingual site with RTL mirroring |
-| *Khair* — Oud · Davana · Pink Pepper | Printed in their own post | The Signature section, note pyramid verbatim |
+| Vermillion `#EE4028` + bone `#E4E1DC` | Their poster artwork — full-bleed split panels | Core palette; the product plates carry it against the dark UI |
+| **Vertical split panel**, product on the seam | Their recurring grid device | Every generated product still is built on it |
+| Letterspaced high-contrast serif wordmark | Their `MAISON / LUXURY PERFUMES` lockup | Cormorant Garamond, `.3em` tracking |
+| Gold packaging accents | Their perfume caps and filigree | `--gold`, reserved for the signature product and primary buy action |
+| Kurdish + Arabic + English captions | Their bilingual posts | Full trilingual site with real RTL mirroring |
+| *Khair* — Oud · Davana · Pink Pepper | Printed in their own post | The Signature section and product page, verbatim |
+| Erbil storefront, `53P5+C3C` | The location the client supplied | Embedded map + directions |
 
-Everything else — product names, prices, journal headlines — is a clearly
-labelled design placeholder. **No invented statistics or testimonials.**
-Vessels in the imagery are unbranded on purpose so real packaging can replace
-them without redesign.
+## The journey
 
-## Art direction
+One continuous **16.6s film sits behind the entire site** and is scrubbed by
+scroll position — atelier, past the shelves, into macro texture, out to the
+flacon. Four generated shots joined with slow cross-dissolves.
 
-Established before any asset was generated, and applied to every one:
+Encoded **all-intra** (`-g 1`) at 12fps so every frame is a keyframe and seeking
+is frame-accurate: 2.5 MB desktop, 685 KB phone.
 
-- **Light** — single large softbox, upper left, 4500 K, deep soft falloff, warm bounce
-- **Material** — glass, brushed gold, ceramic, plaster, silk. No plastic, no chrome, no iridescence
-- **Camera** — 100 mm macro, f/4–f/5.6, eye level, negative space reserved for type
-- **Motion** — 0.9–1.4 s, `cubic-bezier(.22,1,.36,1)`, opacity + small translate only
+Product pages carry a **drag-to-spin 360° viewer** on the two products with
+turntable footage; it drifts slowly until the shopper takes hold of it.
 
-## The 3D
-
-Scroll-driven turntable footage, generated with Higgsfield and **scrubbed by
-scroll position** rather than played. Videos are re-encoded **all-intra**
-(`-g 1`) so every frame is a keyframe and seeking is frame-accurate.
-
-- Desktop hero → landscape plate · phones (≤600px) → a **separate square cut** where the flacon is whole
 - MP4/H.264 preferred, **VP9/WebM fallback** for browsers built without proprietary codecs
-- `-sm` encodes for ≤768px, lazy-loaded via `IntersectionObserver`, poster shown until the first frame is decoded
-- Skipped entirely on `save-data`, `prefers-reduced-motion`, or when no codec decodes — the poster carries the section
+- Skipped on `save-data`, `prefers-reduced-motion`, weak devices, or when no codec decodes — the poster carries the page
 
-> **Deployment note:** scrubbing needs HTTP **range requests** (`206`). Every real
-> static host does this (nginx, Apache, Netlify, Vercel, Pages, S3/CloudFront).
-> Python's `http.server` does **not** — video will load but refuse to seek.
+> **Deployment note:** scrubbing needs HTTP **range requests** (`206`). Real static
+> hosts do this; Python's `http.server` does not — video loads but refuses to seek.
+
+## Shop, bag and checkout
+
+Five instant client-side views: **home · shop · product · cart · checkout**.
+Routing is hash-based and fetches no documents — the curtain is the transition.
+
+- Bag lives in `localStorage` and survives reloads
+- Delivery is the brand's real model: Erbil free, other cities 5,000–10,000 IQD, free over 100,000 IQD
+- **Cash on delivery** — how the brand already ships. No card fields anywhere
+- Placing an order builds a formatted summary and hands it to the customer to send via WhatsApp or Instagram. **Nothing is transmitted and no payment is taken**
+
+Taking card payments would need a real backend and a payment provider; that is
+deliberately not faked here.
+
+## The advisor
+
+A guided beauty consultant (`assets/js/advisor.js`): greeting → counter →
+concern → a recommendation drawn from the real catalogue, with free-text routing
+in all three languages.
+
+It is **deterministic and on-device — it does not call a language model.** A
+static page cannot hold an API key safely. The conversation design is what would
+sit in front of one; wiring a real LLM needs a small server-side proxy. It says
+what it does not know rather than inventing an answer.
 
 ## Trilingual + RTL
 
-English · العربية · کوردی (Sorani). Every string lives in
-`assets/js/i18n.js` — 125 keys × 3 languages, nothing hard-coded in markup.
+English · العربية · کوردی (Sorani). Every string lives in `assets/js/i18n.js` —
+262 keys × 3 languages, nothing hard-coded in markup.
 
-Switching language sets `lang`, `dir` and `data-font` on `<html>`. The layout
-mirrors for real because it is built on **logical properties**
-(`margin-inline`, `inset-inline`, `border-inline-start`) — including the hero
-plate, which flips so the copy always sits on the bone half. Choice persists in
-`localStorage`.
+Switching sets `lang`, `dir` and `data-font` on `<html>`. The layout mirrors for
+real because it is built on **logical properties**, including the 360 viewer's
+drag direction. Choice persists in `localStorage`.
 
-Fonts are **self-hosted** (296 KB total) — no third-party request, which matters
-on regional networks. Sorani coverage (ڕ ڵ ۆ ێ ژ چ پ گ) verified against the
-shipped subsets.
+Fonts are **self-hosted** (296 KB) — no third-party request, which matters on
+regional networks. Sorani coverage (ڕ ڵ ۆ ێ ژ چ پ گ) verified against the subsets.
+
+## The map
+
+The Erbil storefront is embedded live and opens into Google Maps for directions.
+
+> The iframe points at `https://www.google.com/maps/embed?...&pb=...` directly,
+> **not** the usual `/maps?q=…&output=embed`. That form 301-redirects with
+> `X-Frame-Options: SAMEORIGIN`, which browsers enforce on the redirect, so it
+> silently fails to frame. If the embed is blocked or unreachable anyway, a
+> styled card with the address and a maps link takes its place.
 
 ## Files
 
 ```
 index.html
-assets/css/maison.css     design system + every section + responsive + RTL
-assets/js/i18n.js         trilingual dictionary
-assets/js/scene.js        scroll-scrub engine + hero dust motes
-assets/js/app.js          i18n engine, instant navigation, reveals, micro-interactions
+assets/css/maison.css     design system, all views, responsive, RTL
+assets/js/i18n.js         trilingual dictionary (262 keys)
+assets/js/catalogue.js    product data (placeholder prices, clearly marked)
+assets/js/store.js        bag, totals, delivery
+assets/js/scene.js        scroll-scrub engine + 360 viewer
+assets/js/advisor.js      guided advisor
+assets/js/app.js          router, i18n engine, view rendering, checkout
 assets/fonts/             self-hosted woff2
 assets/img/ assets/video/ campaign assets
 ```
 
+## Placeholder data
+
+Product names, prices and descriptions are **design placeholders** for layout
+review — the checkout says so on screen. Imagery uses unbranded vessels on
+purpose so real packaging drops in without redesign. No invented statistics or
+testimonials anywhere.
+
 ## Verified
 
-- 8 widths (1920→375) × 3 languages = 24 combinations: no horizontal overflow,
-  no overlap, no console errors, no tap target under 44px
-- 21 interaction tests: loader, instant curtain navigation (0 document
-  re-fetches), language switch + RTL + persistence, mobile menu, scroll lock
-- Navigation is genuinely instant — `scroll-behavior` is `auto` and the curtain
-  carries the transition, so the jump completes before it lifts
+- **120 checks** — 5 views × 8 widths (1920→375) × 3 languages: no horizontal
+  overflow, no overlap, no console errors, no tap target under 30px
+- **24 interaction tests** — loader, instant routing (0 document re-fetches),
+  scroll-scrubbing, filter, sort, bag persistence, delivery-fee maths, order
+  placement, advisor conversation, language switch + RTL, mobile menu
