@@ -49,30 +49,47 @@ Scroll-scrubbed video stutters for three reasons. All three are addressed:
    **54 seeks for 56 frame changes** — effectively no wasted work, and zero
    stalls.
 
-### Getting the quality up
+### What actually costs latency
 
-All-intra (`-g 1`) is the obvious choice for seeking, but it is expensive.
-Measured seek latency at 1600×900, fully prefetched:
+Measured, fully prefetched, both scroll directions (VP9, software decode):
 
-| GOP | size | median seek | p90 | max |
+| variant | size | fwd median | fwd p90 | back median |
 |---|---|---|---|---|
-| `g=1` all-intra | 10.05 MB | 27 ms | 34.5 ms | 36.8 ms |
-| **`g=6`** | **2.59 MB** | **24.1 ms** | 37.9 ms | 41.8 ms |
-| `g=12` | 1.92 MB | 29.9 ms | 49.4 ms | 78.6 ms |
+| 960 g=3 | 4.03 MB | **12.3 ms** | 15.4 ms | 11.8 ms |
+| 1280 g=3 | 5.45 MB | **13.4 ms** | 18.5 ms | 14.0 ms |
+| 1280 g=6 | 2.98 MB | 17.1 ms | 25.6 ms | 14.5 ms |
+| 1280 g=2 | 7.61 MB | 16.4 ms | 22.5 ms | 16.5 ms |
+| 1920 g=3 | 8.40 MB | 23.0 ms | 30.7 ms | 21.3 ms |
+| 1920 g=6 | 4.64 MB | 23.0 ms | 36.1 ms | 22.5 ms |
 
-`g=6` seeks as fast as all-intra at a quarter of the bytes; `g=12` degrades the
-tail. The saved budget went into resolution, a much lower CRF, and 24fps (one
-frame per ~33px of scroll instead of ~65px).
+Three findings, all of which changed the build:
 
-### Tiers
+1. **Resolution dominates.** 1920 costs roughly double 1280. An earlier version
+   of this site upgraded to a 1920 tier for "quality" — behind a 50–96% veil that
+   detail is invisible, and it halved the frame rate of the scrub. **That tier is
+   gone.** The quality went into a lower CRF at 1280 instead.
+2. **`g=3` beats both `g=6` and `g=2`.** Fewer frames to decode per seek than
+   `g=6`, without the bitrate penalty of `g=2`.
+3. **`fastSeek()` is a red herring** — within noise of ordinary `currentTime`.
 
-| Device | First load | Then |
-|---|---|---|
-| Phone | `journey-sm` 960×540 · 1.6 MB | — |
-| Tablet / desktop | `journey-lo` 1280×720 · 2.7 MB | **`journey` 1920×1080 · 8.2 MB, swapped in at the same frame** |
+Bitrate matters too, but less: at 1280, CRF 18 → 20.9 ms and CRF 34 → 15 ms.
 
-Scrubbing is immediate; the high-resolution cut arrives quietly a few seconds
-later and replaces it without a visible change of position.
+### Keeping up with a fast scroll
+
+Two more things the loop does:
+
+- **Snap the large gaps.** A flick can move the target seconds ahead. Easing
+  through it would decode every frame in between and fall behind, so most of the
+  distance closes at once and only the last stretch eases. A flick from the top
+  to 90% of the page settles in **8 ms**.
+- **Pace seeks to measured decode cost.** The loop times its own seeks and keeps
+  a rolling average, then refuses to ask for a new frame faster than the device
+  has actually been managing. Asking every animation frame oversubscribes the
+  decoder and the main thread hitches.
+
+Result on a 90-step scroll: **79 distinct frames, 77 seeks, zero stalls** — up
+from 43 frames before this work. The 360 viewers drag at ~60 ms⁻¹ median with
+zero stalls on both desktop and phone.
 
 ### Product 360°
 
@@ -200,9 +217,9 @@ which is what actually helps a physical shop surface locally.
 - **24 interaction tests** — loader, instant routing (0 document re-fetches),
   scroll-scrubbing, filter, sort, bag persistence, delivery-fee maths, order
   placement, advisor conversation, language switch + RTL, mobile menu
-- **Scrub benchmark** — 0 stalls over a 90-step scroll, 54 seeks for 56 frame
-  changes, HD tier confirmed swapping in at 1920×1080 on desktop and tablet
-  while phones stay on the light cut
+- **Scrub benchmark** — 0 stalls over a 90-step scroll, 77 seeks for 79 frame
+  changes, and a top-to-90% flick settling in 8 ms; 360 viewers drag at ~60fps
+  with 0 stalls on desktop and phone
 - **axe-core** — 0 violations across all five views plus the advisor open
 - **12 keyboard tests** — skip link, focus on route change, live announcement,
   arrow-key product rotation, advisor and menu focus traps with focus restored

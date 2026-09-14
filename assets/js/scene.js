@@ -86,7 +86,6 @@
   function VideoScrubber(opts) {
     this.el       = opts.el;
     this.src      = pick(opts.base, small);
-    this.hiSrc    = opts.hiBase ? pick(opts.hiBase, false) : null;
     this.range    = opts.range;
     this.onFrame  = opts.onFrame || null;
     this.onReady  = opts.onReady || null;
@@ -94,6 +93,8 @@
     this.manual   = !!opts.manual;
     this.fps      = opts.fps || 12;        // source rate, for frame quantising
     this._frame   = -1;
+    this._seekAt  = 0;
+    this._cost    = 18;                    // measured seek cost, adapts per device
 
     this.progress = 0;
     this.current  = 0;
@@ -126,10 +127,7 @@
     var self = this;
     prefetch(this.src, this.onProg)
       .then(function (blob) { return self._attach(blob); })
-      .then(function () {
-        if (self.onReady) self.onReady(true);
-        if (self.hiSrc && self.hiSrc !== self.src) self._upgrade();
-      })
+      .then(function () { if (self.onReady) self.onReady(true); })
       .catch(function () {
         // network or CORS trouble: stream it the ordinary way rather than fail
         self._attachDirect(self.src);
@@ -182,20 +180,6 @@
     v.load();
   };
 
-  /* quietly fetch the high-resolution tier and swap it in at the same frame */
-  VideoScrubber.prototype._upgrade = function () {
-    var self = this;
-    if (slowNet || conn.saveData) return;
-    prefetch(self.hiSrc).then(function (blob) {
-      var at = self.current;
-      return self._attach(blob).then(function () {
-        self.current = at;
-        self._frame = -1;                  // force a repaint on the new source
-        try { self.el.currentTime = at; } catch (e) {}
-      });
-    }).catch(function () { /* the light tier is already good */ });
-  };
-
   VideoScrubber.prototype.setProgress = function (p) { this.progress = clamp(p, 0, 1); };
 
   VideoScrubber.prototype.update = function () {
@@ -215,13 +199,25 @@
     var now = performance.now();
     var dt = this._last ? Math.min(64, now - this._last) : 16.7;
     this._last = now;
-    var k = reduced ? 1 : 1 - Math.pow(1 - 0.16, dt / 16.7);
+
+    // On a fast scroll the gap can be seconds wide. Easing through it would
+    // decode every frame in between at ~15ms each and fall behind, so close
+    // most of the distance at once and ease only the last stretch.
+    var gap = this.target - this.current;
+    if (Math.abs(gap) > 0.5) this.current = this.target - (gap > 0 ? 0.28 : -0.28);
+
+    var k = reduced ? 1 : 1 - Math.pow(1 - 0.18, dt / 16.7);
     this.current = lerp(this.current, this.target, k);
 
     if (this.onFrame) this.onFrame(p);
 
     // never stack seeks — that is what makes scrubbing feel like it snags
     if (this.el.seeking) return;
+
+    // Decoding costs real time. Issuing a seek every animation frame asks for
+    // more than the decoder can deliver and the main thread starts to hitch,
+    // so pace requests to what this device has actually been managing.
+    if (now - this._seekAt < this._cost * 0.9) return;
 
     // Quantise to source frames. Seeking inside a frame we are already
     // showing costs a full seek round-trip and changes nothing on screen,
@@ -232,6 +228,15 @@
     if (frame > max) frame = max;
     if (frame === this._frame) return;
     this._frame = frame;
+
+    var self = this, t0 = now;
+    this._seekAt = now;
+    this.el.addEventListener('seeked', function once () {
+      self.el.removeEventListener('seeked', once);
+      // rolling average, clamped to something sane
+      var took = performance.now() - t0;
+      self._cost = Math.max(8, Math.min(60, self._cost * 0.8 + took * 0.2));
+    });
 
     try { this.el.currentTime = (frame + 0.5) / this.fps; } catch (e) {}
   };

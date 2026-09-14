@@ -558,11 +558,11 @@
     var v = $('#bgVideo'); if (!v) return;
     journey = new SCENE.VideoScrubber({
       el: v,
-      // "a|b" picks b on phones and a elsewhere, and unlike the plain form it
-      // does not also append -sm — the tiers here are already explicit.
-      // Everyone but phones is then quietly upgraded to the 1920 cut.
-      base:   'journey-lo|journey-sm',
-      hiBase: flags.phone ? null : 'journey',
+      // One tier per device, no upgrade. Measured: seek latency is driven by
+      // resolution far more than by bitrate, and a 1920 cut roughly doubled it
+      // (23ms vs 13ms at 1280) for detail that is invisible behind the veil.
+      // Smooth wins; the quality goes into a lower CRF at 1280 instead.
+      base: 'journey|journey-sm',
       eager: true,
       fps: 24,                                   // the journey is cut at 24fps
       range: function () { return docRange; },
