@@ -283,6 +283,19 @@
     function onTStart(e) { begin(e.touches[0].clientX); }
     function onTMove(e) { move(e.touches[0].clientX); }
 
+    // a turntable is a control, so it must be operable from the keyboard too
+    host.setAttribute('tabindex', '0');
+    host.setAttribute('role', 'img');
+    function onKey(e) {
+      var step = e.shiftKey ? 0.12 : 0.035;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { touched = true; s.setProgress((s.progress + step) % 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { touched = true; s.setProgress((s.progress - step + 1) % 1); }
+      else if (e.key === 'Home') { touched = true; s.setProgress(0); }
+      else return;
+      e.preventDefault();
+    }
+    host.addEventListener('keydown', onKey);
+
     host.addEventListener('mousedown', onDown);
     addEventListener('mousemove', onMove);
     addEventListener('mouseup', end);
@@ -300,6 +313,7 @@
       running = false;
       if (raf) cancelAnimationFrame(raf);
       io.disconnect();
+      host.removeEventListener('keydown', onKey);
       removeEventListener('mousemove', onMove);
       removeEventListener('mouseup', end);
       if (s._url) { try { URL.revokeObjectURL(s._url); } catch (e) {} }

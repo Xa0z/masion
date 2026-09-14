@@ -161,6 +161,38 @@ review — the checkout says so on screen. Imagery uses unbranded vessels on
 purpose so real packaging drops in without redesign. No invented statistics or
 testimonials anywhere.
 
+## Accessibility
+
+Audited with axe-core across every view, and by hand for the things axe cannot
+see. **Zero violations** on home, shop, product, cart, checkout and with the
+advisor open.
+
+- **Contrast** — computed for every token in use. The red panel was the one real
+  failure (body copy at 3.14:1, the label at 2.27:1). Fixed by setting near-black
+  type on the brand vermillion — **4.99:1**, and closer to the way the brand sets
+  type on red in its own artwork than white-on-red was.
+- **Focus follows the route.** A client-side view change behaves like a page
+  change: focus moves to the new view's heading and the change is announced
+  through a dedicated live region — not an `aria-live` on the whole `<main>`,
+  which would narrate every DOM mutation.
+- **Focus traps** on the advisor dialog and the mobile menu, each restoring focus
+  to the control that opened it on Escape.
+- **The 360 viewer is a real control** — focusable, with arrow keys to turn it
+  (Shift for a coarser step, Home to reset) and a described purpose.
+- Skip link, named image-only links, corrected heading order, and a visible
+  focus ring on everything.
+
+> One audit note worth keeping: `[data-reveal]` starts at `opacity:0`, and axe
+> skips invisible nodes — so the first clean run was a false negative. The audit
+> forces every reveal on before scanning.
+
+## Findability
+
+Open Graph and Twitter cards with a real 1200×630 image, canonical URL, locale
+alternates, and `HealthAndBeautyBusiness` structured data carrying the Erbil
+address, the map link, IQD currency, cash-on-delivery and the three languages —
+which is what actually helps a physical shop surface locally.
+
 ## Verified
 
 - **120 checks** — 5 views × 8 widths (1920→375) × 3 languages: no horizontal
@@ -171,3 +203,6 @@ testimonials anywhere.
 - **Scrub benchmark** — 0 stalls over a 90-step scroll, 54 seeks for 56 frame
   changes, HD tier confirmed swapping in at 1920×1080 on desktop and tablet
   while phones stay on the light cut
+- **axe-core** — 0 violations across all five views plus the advisor open
+- **12 keyboard tests** — skip link, focus on route change, live announcement,
+  arrow-key product rotation, advisor and menu focus traps with focus restored

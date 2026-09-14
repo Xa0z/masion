@@ -128,6 +128,7 @@
      ====================================================================== */
   var VIEWS = ['home', 'shop', 'product', 'cart', 'checkout'];
   var route = { view: 'home', param: '', anchor: '' };
+  var mounted = false;
 
   function parseHash(h) {
     h = (h || location.hash || '#/').replace(/^#/, '');
@@ -166,6 +167,8 @@
     observeReveals();
     updateJourneyRange();
     onScroll();
+    if (mounted) { focusView(); announceView(); }
+    mounted = true;
   }
 
   function navigate(hash, instant) {
@@ -204,6 +207,44 @@
     }, delay || 300);
   }
 
+  /* ----------------------------------------------------------------------
+     focus — a client-side view change must behave like a page change:
+     move focus to the new view so screen readers and the keyboard follow.
+     ---------------------------------------------------------------------- */
+  /* Name the view that just mounted, for anyone not watching the screen. */
+  function announceView() {
+    var el = $('#announcer'); if (!el) return;
+    var h = $('.view.is-on h1') || $('.view.is-on .hero__title');
+    el.textContent = h ? h.textContent.trim() : '';
+  }
+
+  function focusView() {
+    var main = $('#main');
+    if (!main) return;
+    var h = $('.view.is-on h1') || $('.view.is-on .hero__title');
+    var target = h || main;
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+  }
+
+  var FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),' +
+                  'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+  function trapFocus(container) {
+    function onKey(e) {
+      if (e.key !== 'Tab') return;
+      var items = $$(FOCUSABLE, container).filter(function (el) {
+        return el.offsetWidth || el.offsetHeight || el.getClientRects().length;
+      });
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    container.addEventListener('keydown', onKey);
+    return function () { container.removeEventListener('keydown', onKey); };
+  }
+
   /* ======================================================================
      5 · rendering
      ====================================================================== */
@@ -212,10 +253,16 @@
 
   function pImg(p, w) { return 'assets/img/' + p.img + '-' + w + '.jpg'; }
 
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   function cardHTML(p) {
     return '' +
       '<article class="card">' +
-        '<a class="card__media" href="#/p/' + p.id + '" data-nav data-tilt>' +
+        '<a class="card__media" href="#/p/' + p.id + '" data-nav data-tilt tabindex="-1" aria-hidden="true">' +
           '<img src="' + pImg(p, 720) + '" srcset="' + pImg(p, 720) + ' 720w, ' + pImg(p, 1200) + ' 1200w" ' +
                'sizes="(max-width:600px) 88vw, (max-width:1024px) 44vw, 23vw" alt="" loading="lazy" decoding="async">' +
           '<span class="card__house">' + t(p.house === 'perfumes' ? 'brand.perfumes' : 'brand.cosmetic') + '</span>' +
@@ -275,7 +322,8 @@
     host.innerHTML = '' +
       '<div class="view__head"><a class="pdp__back" href="#/shop" data-nav>← ' + t('pdp.back') + '</a></div>' +
       '<div class="pdp">' +
-        '<div class="pdp__media' + (wide ? ' pdp__media--wide' : '') + '" id="pdpMedia">' +
+        '<div class="pdp__media' + (wide ? ' pdp__media--wide' : '') + '" id="pdpMedia"' +
+             (spin ? ' aria-label="' + esc(t('ui.spinHelp')) + '"' : '') + '>' +
           (spin ? '<video class="pdp__video" id="pdpVideo" muted playsinline preload="none" disablepictureinpicture poster="' + spin.poster + '"></video>' : '') +
           '<img class="pdp__still" src="' + pImg(p, 1200) + '" srcset="' + pImg(p, 720) + ' 720w, ' + pImg(p, 1200) + ' 1200w" ' +
               'sizes="(max-width:1024px) 92vw, 48vw" alt="" decoding="async">' +
@@ -330,7 +378,8 @@
         '<div class="cart__list">' +
           ls.map(function (l) {
             return '<div class="cart__row">' +
-              '<a class="cart__thumb" href="#/p/' + l.id + '" data-nav><img src="' + pImg(l.product, 720) + '" alt="" loading="lazy"></a>' +
+              '<a class="cart__thumb" href="#/p/' + l.id + '" data-nav aria-label="' + esc(t('p.' + l.id + '.name')) + '">' +
+                '<img src="' + pImg(l.product, 720) + '" alt="" loading="lazy"></a>' +
               '<div>' +
                 '<a class="cart__name" href="#/p/' + l.id + '" data-nav>' + t('p.' + l.id + '.name') + '</a>' +
                 '<div class="cart__kind">' + t('p.' + l.id + '.kind') + ' · ' + l.product.size + '</div>' +
@@ -346,7 +395,7 @@
           }).join('') +
         '</div>' +
         '<aside class="summary">' +
-          '<h3>' + t('co.summary') + '</h3>' +
+          '<h2>' + t('co.summary') + '</h2>' +
           '<div class="summary__row"><span>' + t('cart.subtotal') + '</span><span>' + fmtPrice(STORE.subtotal()) + '</span></div>' +
           '<div class="summary__row summary__row--total"><span>' + t('cart.total') + '</span><span>' + fmtPrice(STORE.subtotal()) + '</span></div>' +
           '<a class="btn btn--full" href="#/checkout" data-nav data-magnetic><span>' + t('cart.checkout') + '</span></a>' +
@@ -377,7 +426,7 @@
       '<form class="co" id="coForm" novalidate>' +
         '<div>' +
           '<div class="co__group">' +
-            '<h3>' + t('co.details') + '</h3>' +
+            '<h2>' + t('co.details') + '</h2>' +
             '<div class="co__fields">' +
               '<div class="co__field co__field--wide"><label for="fName">' + t('co.name') + '</label>' +
                 '<input class="field" id="fName" name="name" autocomplete="name"><span class="co__err"></span></div>' +
@@ -397,7 +446,7 @@
             '</div>' +
           '</div>' +
           '<div class="co__group">' +
-            '<h3>' + t('co.payment') + '</h3>' +
+            '<h2>' + t('co.payment') + '</h2>' +
             '<div class="pay"><div class="pay__opt">' +
               '<span class="pay__mark"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
               '<span><strong>' + t('co.cod') + '</strong><p>' + t('co.codNote') + '</p></span>' +
@@ -405,7 +454,7 @@
           '</div>' +
         '</div>' +
         '<aside class="summary">' +
-          '<h3>' + t('co.summary') + '</h3>' +
+          '<h2>' + t('co.summary') + '</h2>' +
           ls.map(function (l) {
             return '<div class="summary__row"><span>' + t('p.' + l.id + '.name') + ' × ' + l.qty + '</span><span>' + fmtPrice(l.line) + '</span></div>';
           }).join('') +
@@ -573,9 +622,30 @@
      ====================================================================== */
   var lastY = 0, ticking = false;
 
+  var spySections = null;
+
+  function updateSpy() {
+    if (route.view !== 'home') {
+      $$('.nav__links a[data-spy]').forEach(function (a) { a.classList.remove('is-active'); });
+      return;
+    }
+    if (!spySections) {
+      spySections = $$('.nav__links a[data-spy]').map(function (a) {
+        return { link: a, el: $('#' + a.getAttribute('data-spy')) };
+      }).filter(function (o) { return o.el; });
+    }
+    var line = window.innerHeight * 0.38, best = null;
+    spySections.forEach(function (o) {
+      var r = o.el.getBoundingClientRect();
+      if (r.top <= line && r.bottom > line) best = o;
+    });
+    spySections.forEach(function (o) { o.link.classList.toggle('is-active', o === best); });
+  }
+
   function updateNav(y, dir) {
     var nav = $('#nav'); if (!nav) return;
     nav.classList.toggle('is-stuck', y > 40);
+    updateSpy();
     var menuOpen = $('#mmenu') && $('#mmenu').classList.contains('is-open');
     var advOpen = $('#advisor') && $('#advisor').classList.contains('is-open');
     nav.classList.toggle('is-hidden', dir > 0 && y > 640 && !menuOpen && !advOpen);
@@ -595,13 +665,17 @@
   /* ======================================================================
      11 · menus
      ====================================================================== */
-  function closeMenu() {
+  var menuRelease = null;
+
+  function closeMenu(restore) {
     var m = $('#mmenu'), b = $('#burger');
     if (!m || !m.classList.contains('is-open')) return;
     m.classList.remove('is-open');
     m.setAttribute('aria-hidden', 'true');
     if (b) b.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('is-locked');
+    if (menuRelease) { menuRelease(); menuRelease = null; }
+    if (restore && b) b.focus();
   }
 
   function initMenus() {
@@ -612,6 +686,11 @@
         m.setAttribute('aria-hidden', open ? 'false' : 'true');
         burger.setAttribute('aria-expanded', open ? 'true' : 'false');
         document.body.classList.toggle('is-locked', open);
+        if (open) {
+          menuRelease = trapFocus(m);
+          var first = $(FOCUSABLE, m);
+          if (first) setTimeout(function () { first.focus(); }, 420);
+        } else if (menuRelease) { menuRelease(); menuRelease = null; }
       });
     }
     var lang = $('#lang'), btn = $('#langBtn');
@@ -627,7 +706,7 @@
       });
     }
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { closeMenu(); if (lang) lang.classList.remove('is-open'); }
+      if (e.key === 'Escape') { closeMenu(true); if (lang) lang.classList.remove('is-open'); }
     });
   }
 
@@ -813,7 +892,7 @@
     STORE.onChange(function () { syncBag(); });
 
     if (window.MAISON_ADVISOR) {
-      window.MAISON_ADVISOR.init({ t: t, fmtPrice: fmtPrice, go: navigate });
+      window.MAISON_ADVISOR.init({ t: t, fmtPrice: fmtPrice, go: navigate, trap: trapFocus });
     }
 
     mount(parseHash(), false);

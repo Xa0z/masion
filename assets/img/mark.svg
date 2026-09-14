@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Maison">
+  <rect width="32" height="64" fill="#E4E1DC"/>
+  <rect x="32" width="32" height="64" fill="#EE4028"/>
+  <text x="32" y="44" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="40" letter-spacing="1"
+        fill="#12100F">M</text>
+</svg>

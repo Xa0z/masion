@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var I18N, STORE, CAT, t, fmtPrice, go;
+  var I18N, STORE, CAT, t, fmtPrice, go, trap;
   var log, panel, launcher, input, form;
   var busy = false;
 
@@ -193,27 +193,37 @@
   }
 
   /* ---------- open / close ---------- */
+  var release = null;
+
   function open() {
     panel.classList.add('is-open');
     panel.setAttribute('aria-hidden', 'false');
     launcher.classList.add('is-hidden');
     launcher.setAttribute('aria-expanded', 'true');
     if (!log.children.length) reset();
-    setTimeout(function () { scrollDown(); }, 60);
+    if (trap) release = trap(panel);
+    setTimeout(function () {
+      scrollDown();
+      if (input && window.innerWidth > 1024) input.focus();
+    }, 120);
   }
-  function close() {
+
+  function close(restore) {
     panel.classList.remove('is-open');
     panel.setAttribute('aria-hidden', 'true');
     launcher.classList.remove('is-hidden');
     launcher.setAttribute('aria-expanded', 'false');
+    if (release) { release(); release = null; }
+    if (restore !== false) launcher.focus();
   }
 
   /* ---------- boot ---------- */
   function init(api) {
     I18N = window.MAISON_I18N; STORE = window.MAISON_STORE; CAT = window.MAISON_CATALOGUE;
-    t = api.t; fmtPrice = api.fmtPrice; go = api.go;
+    t = api.t; fmtPrice = api.fmtPrice; go = api.go; trap = api.trap;
 
     panel    = document.getElementById('advisor');
+    if (panel) { panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); }
     launcher = document.getElementById('advisorLaunch');
     log      = document.getElementById('advisorLog');
     input    = document.getElementById('advisorInput');
@@ -221,7 +231,7 @@
     if (!panel || !launcher) return;
 
     launcher.addEventListener('click', open);
-    document.getElementById('advisorClose').addEventListener('click', close);
+    document.getElementById('advisorClose').addEventListener('click', function () { close(true); });
     document.getElementById('advisorReset').addEventListener('click', reset);
 
     form.addEventListener('submit', function (e) {
@@ -237,12 +247,12 @@
     });
 
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && panel.classList.contains('is-open')) close();
+      if (e.key === 'Escape' && panel.classList.contains('is-open')) close(true);
     });
 
     // following a recommendation closes the sheet on small screens
     panel.addEventListener('click', function (e) {
-      if (e.target.closest && e.target.closest('[data-nav]') && window.innerWidth <= 1024) close();
+      if (e.target.closest && e.target.closest('[data-nav]') && window.innerWidth <= 1024) close(false);
     });
   }
 
