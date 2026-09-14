@@ -6,6 +6,13 @@ alongside curated skincare, cosmetics and hair care.
 
 Static site. No backend, no database, no build step. Open `index.html`.
 
+**Live:** https://maison-cosmetic-ahmads-projects-3806fa63.vercel.app
+
+Deployed on Vercel from this branch (it is the repo's default branch, so Vercel
+treats it as production). Every push redeploys automatically. The GitHub repo is
+private; the deployed site is public — Vercel Authentication is turned off so the
+marketing page is reachable without a login.
+
 ---
 
 ## Brand research
