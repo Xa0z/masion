@@ -223,9 +223,9 @@ html[data-font="arabic"] .btn{ letter-spacing:.04em; text-transform:none; font-s
 .loader__rule{ width:min(260px,52vw); height:1px; margin:var(--s5) auto var(--s4);
   background:rgba(247,245,242,.2); overflow:hidden; }
 .loader__rule i{ display:block; height:100%; width:100%; background:var(--red);
-  transform:scaleX(0); transform-origin:left; animation:loadBar 1.15s .3s var(--ease-io) forwards; }
+  transform:scaleX(.04); transform-origin:left;
+  transition:transform .35s cubic-bezier(.22,1,.36,1); }
 [dir="rtl"] .loader__rule i{ transform-origin:right; }
-@keyframes loadBar{ to{ transform:scaleX(1) } }
 .loader__tag{ font-size:var(--t-label); letter-spacing:.3em; text-transform:uppercase;
   color:rgba(247,245,242,.5); opacity:0; animation:loadIn .8s .5s var(--ease) forwards; }
 html[data-font="arabic"] .loader__tag{ letter-spacing:.08em; text-transform:none; }
@@ -622,12 +622,25 @@ html[data-font="arabic"] .pdp__back{ letter-spacing:.02em; text-transform:none; 
 .pdp__video.is-ready + .pdp__still{ opacity:0; }
 .pdp__spin{
   position:absolute; inset-block-end:var(--s3); inset-inline-start:50%; translate:-50% 0;
-  display:flex; align-items:center; gap:var(--s2);
-  padding:8px 14px; border-radius:999px;
-  background:rgba(14,13,12,.6); backdrop-filter:blur(8px); color:var(--paper);
+  display:flex; align-items:center; gap:9px;
+  padding:8px 15px; border-radius:999px;
+  background:rgba(14,13,12,.62); backdrop-filter:blur(10px); color:var(--paper);
   font-size:.56rem; letter-spacing:.18em; text-transform:uppercase; white-space:nowrap;
+  max-inline-size:calc(100% - 1.5rem); overflow:hidden;
   opacity:0; transition:opacity .5s var(--ease); pointer-events:none;
 }
+.pdp__spin b{ font-weight:400; }
+.pdp__spin i{ font-style:normal; opacity:.6; }
+/* a real ring: it fills with the bytes fetched, then gives way to the label */
+.pdp__ring{
+  width:13px; height:13px; flex:none; border-radius:50%;
+  background:conic-gradient(var(--gold-lt) var(--p,0%), rgba(247,245,242,.22) 0);
+  transition:opacity .4s var(--ease);
+}
+.pdp__media.is-loaded .pdp__ring{ opacity:0; width:0; }
+.pdp__media.is-loaded .pdp__spin i{ opacity:.6; }
+.pdp__media:not(.is-loaded) .pdp__spin b,
+.pdp__media:not(.is-loaded) .pdp__spin i{ opacity:.45; }
 html[data-font="arabic"] .pdp__spin{ letter-spacing:.02em; text-transform:none; font-size:.7rem; }
 .pdp__media.has-spin .pdp__spin{ opacity:1; }
 .pdp__media.has-spin{ cursor:ew-resize; touch-action:pan-y; }
@@ -919,6 +932,8 @@ html[data-font="arabic"] .notice button{ letter-spacing:.02em; text-transform:no
   .pgrid, .pgrid--3{ grid-template-columns:1fr; gap:var(--s6); }
   .card__media{ aspect-ratio:4/5; }
 
+  /* the badge keeps the ring and 360 mark; the hint would overflow */
+  .pdp__spin i{ display:none; }
   .pdp__buy{ flex-direction:column; align-items:stretch; }
   .pdp__buy .qty{ align-self:flex-start; }
   .pdp__spec > div{ flex-direction:column; gap:var(--s1); align-items:flex-start; }

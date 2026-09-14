@@ -30,21 +30,68 @@ The visual system is derived from the brand's own posts, not invented:
 
 ## The journey
 
-One continuous **16.6s film sits behind the entire site** and is scrubbed by
-scroll position — atelier, past the shelves, into macro texture, out to the
-flacon. Four generated shots joined with slow cross-dissolves.
+One continuous **16.6s film sits behind the entire site**, scrubbed by scroll —
+atelier, past the shelves, into macro texture, out to the flacon. Four generated
+shots joined with slow cross-dissolves.
 
-Encoded **all-intra** (`-g 1`) at 12fps so every frame is a keyframe and seeking
-is frame-accurate: 2.5 MB desktop, 685 KB phone.
+### Making it smooth
 
-Product pages carry a **drag-to-spin 360° viewer** on the two products with
-turntable footage; it drifts slowly until the shopper takes hold of it.
+Scroll-scrubbed video stutters for three reasons. All three are addressed:
+
+1. **Prefetch to a blob.** The file is fetched in full and handed to the video
+   element as an object URL, so every seek is memory-local — no range request
+   mid-scroll. The loader bar is the real byte progress, and the hero is not
+   revealed until the film can actually scrub (~1.8s on a warm connection).
+2. **Never stack seeks.** A new seek is only issued when none is in flight.
+   Overlapping seeks are what makes scrubbing feel like it is snagging.
+3. **Quantise to source frames.** Seeking inside a frame already on screen
+   costs a full round-trip and changes nothing. Measured on a 90-step scroll:
+   **54 seeks for 56 frame changes** — effectively no wasted work, and zero
+   stalls.
+
+### Getting the quality up
+
+All-intra (`-g 1`) is the obvious choice for seeking, but it is expensive.
+Measured seek latency at 1600×900, fully prefetched:
+
+| GOP | size | median seek | p90 | max |
+|---|---|---|---|---|
+| `g=1` all-intra | 10.05 MB | 27 ms | 34.5 ms | 36.8 ms |
+| **`g=6`** | **2.59 MB** | **24.1 ms** | 37.9 ms | 41.8 ms |
+| `g=12` | 1.92 MB | 29.9 ms | 49.4 ms | 78.6 ms |
+
+`g=6` seeks as fast as all-intra at a quarter of the bytes; `g=12` degrades the
+tail. The saved budget went into resolution, a much lower CRF, and 24fps (one
+frame per ~33px of scroll instead of ~65px).
+
+### Tiers
+
+| Device | First load | Then |
+|---|---|---|
+| Phone | `journey-sm` 960×540 · 1.6 MB | — |
+| Tablet / desktop | `journey-lo` 1280×720 · 2.7 MB | **`journey` 1920×1080 · 8.2 MB, swapped in at the same frame** |
+
+Scrubbing is immediate; the high-resolution cut arrives quietly a few seconds
+later and replaces it without a visible change of position.
+
+### Product 360°
+
+The two products with turntable footage get a **drag-to-spin viewer**, prefetched
+with a progress ring, drifting slowly until the shopper takes hold of it. Khair's
+footage was **AI-upscaled to 2160×2880** (Topaz) — the filigree and the engraved
+collar band genuinely resolve — then shipped at 1080×1440.
+
+> **Note on "4K":** the source footage generates at 720–1080p, so shipping a 4K
+> background would be upscaling, not detail — and a 4K all-intra film could never
+> be prefetched, which is the thing that makes scrubbing smooth. The upscale was
+> spent where resolution is actually examined: the product viewer.
 
 - MP4/H.264 preferred, **VP9/WebM fallback** for browsers built without proprietary codecs
-- Skipped on `save-data`, `prefers-reduced-motion`, weak devices, or when no codec decodes — the poster carries the page
+- Skipped on `save-data`, `prefers-reduced-motion`, 2G, or weak devices — the poster carries the page
 
-> **Deployment note:** scrubbing needs HTTP **range requests** (`206`). Real static
-> hosts do this; Python's `http.server` does not — video loads but refuses to seek.
+> **Deployment note:** the blob prefetch means range requests are no longer on the
+> critical path, but the direct-stream fallback still needs a host that serves
+> `206`. Real static hosts do; Python's `http.server` does not.
 
 ## Shop, bag and checkout
 
@@ -121,3 +168,6 @@ testimonials anywhere.
 - **24 interaction tests** — loader, instant routing (0 document re-fetches),
   scroll-scrubbing, filter, sort, bag persistence, delivery-fee maths, order
   placement, advisor conversation, language switch + RTL, mobile menu
+- **Scrub benchmark** — 0 stalls over a 90-step scroll, 54 seeks for 56 frame
+  changes, HD tier confirmed swapping in at 1920×1080 on desktop and tablet
+  while phones stay on the light cut

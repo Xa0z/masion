@@ -279,7 +279,7 @@
           (spin ? '<video class="pdp__video" id="pdpVideo" muted playsinline preload="none" disablepictureinpicture poster="' + spin.poster + '"></video>' : '') +
           '<img class="pdp__still" src="' + pImg(p, 1200) + '" srcset="' + pImg(p, 720) + ' 720w, ' + pImg(p, 1200) + ' 1200w" ' +
               'sizes="(max-width:1024px) 92vw, 48vw" alt="" decoding="async">' +
-          (spin ? '<span class="pdp__spin">360°</span>' : '') +
+          (spin ? '<span class="pdp__spin"><span class="pdp__ring" id="spinRing"></span><b>360°</b><i>' + t('pdp.drag') + '</i></span>' : '') +
         '</div>' +
         '<div>' +
           '<p class="pdp__house">' + t(p.house === 'perfumes' ? 'brand.perfumes' : 'brand.cosmetic') + '</p>' +
@@ -306,7 +306,13 @@
                     .slice(0, 3).map(cardHTML).join('') +
       '</div></section>';
 
-    if (spin) SCENE.mountSpin($('#pdpMedia'), $('#pdpVideo'), spin);
+    if (spin) {
+      var media = $('#pdpMedia');
+      var ring = $('#spinRing');
+      SCENE.mountSpin(media, $('#pdpVideo'), spin, function (pr) {
+        if (ring) ring.style.setProperty('--p', (pr * 100).toFixed(1) + '%');
+      });
+    }
   }
 
   function renderCart() {
@@ -497,13 +503,22 @@
     docRange = { start: 0, end: h };
   }
 
+  var journeyReady = false;
+
   function initJourney() {
     var v = $('#bgVideo'); if (!v) return;
     journey = new SCENE.VideoScrubber({
       el: v,
-      base: 'journey',
+      // "a|b" picks b on phones and a elsewhere, and unlike the plain form it
+      // does not also append -sm — the tiers here are already explicit.
+      // Everyone but phones is then quietly upgraded to the 1920 cut.
+      base:   'journey-lo|journey-sm',
+      hiBase: flags.phone ? null : 'journey',
       eager: true,
+      fps: 24,                                   // the journey is cut at 24fps
       range: function () { return docRange; },
+      onProgress: setLoadProgress,
+      onReady: function () { journeyReady = true; releaseLoader(); },
       onFrame: function (p) {
         var c = $('#chapter');
         if (c && route.view === 'home') {
@@ -512,6 +527,8 @@
         }
       }
     });
+    // never let a stalled network hold the door shut
+    setTimeout(function () { journeyReady = true; releaseLoader(); }, 6000);
   }
 
   /* ======================================================================
@@ -755,6 +772,32 @@
   }
 
   /* ======================================================================
+     12b · loading — the bar tracks the real prefetch, and the hero is not
+     revealed until the film is actually able to scrub
+     ====================================================================== */
+  var pageLoaded = false, bootAt = 0, loaderGone = false;
+
+  function setLoadProgress(p) {
+    var bar = $('#loaderBar');
+    if (bar) bar.style.transform = 'scaleX(' + Math.max(0.04, p).toFixed(3) + ')';
+  }
+
+  function releaseLoader() {
+    if (loaderGone) return;
+    if (!journeyReady || !pageLoaded) return;
+    loaderGone = true;
+    setLoadProgress(1);
+    var loader = $('#loader');
+    if (!loader) return;
+    // let the filled bar register before the curtain lifts
+    var wait = Math.max(0, 900 - (Date.now() - bootAt));
+    setTimeout(function () {
+      loader.classList.add('is-done');
+      setTimeout(function () { if (loader.parentNode) loader.remove(); }, 800);
+    }, wait);
+  }
+
+  /* ======================================================================
      13 · boot
      ====================================================================== */
   function boot() {
@@ -784,19 +827,12 @@
     onScroll();
     if (!flags.reduced) requestAnimationFrame(idleLoop);
 
-    var loader = $('#loader');
-    function dismiss() {
-      if (!loader) return;
-      loader.classList.add('is-done');
-      setTimeout(function () { loader.remove(); }, 800);
-    }
-    if (flags.reduced) dismiss();
-    else {
-      var t0 = Date.now();
-      var go = function () { setTimeout(dismiss, Math.max(0, 1400 - (Date.now() - t0))); };
-      if (document.readyState === 'complete') go(); else addEventListener('load', go);
-      setTimeout(dismiss, 3200);
-    }
+    if (flags.reduced) { journeyReady = true; }
+    pageLoaded = document.readyState === 'complete';
+    if (!pageLoaded) addEventListener('load', function () { pageLoaded = true; releaseLoader(); });
+    bootAt = Date.now();
+    releaseLoader();
+    setTimeout(function () { journeyReady = true; pageLoaded = true; releaseLoader(); }, 7000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
