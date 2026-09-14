@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maison — Luxury Perfumes &amp; Cosmetic</title>
+<meta name="description" data-i18n-attr="content:doc.desc" content="Maison. A house of luxury perfume, skincare and colour — curated in Kurdistan, delivered across Iraq.">
+<meta name="theme-color" content="#12100F">
+
+<link rel="preload" href="assets/fonts/cormorant-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/maison.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EE4028'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23F6F4F1' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ═══════════════ LOADER ═══════════════ -->
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="loader__inner">
+    <div class="loader__mark">
+      <span class="loader__letter">M</span><span class="loader__letter">A</span><span class="loader__letter">I</span><span class="loader__letter">S</span><span class="loader__letter">O</span><span class="loader__letter">N</span>
+    </div>
+    <div class="loader__rule"><i></i></div>
+    <div class="loader__tag" data-i18n="loader.tagline">Scent · Skin · Colour</div>
+  </div>
+</div>
+
+<!-- ═══════════════ CURTAIN (instant nav transition) ═══════════════ -->
+<div class="curtain" id="curtain" aria-hidden="true"><span class="curtain__mark">MAISON</span></div>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<header class="nav" id="nav">
+  <div class="nav__bar">
+
+    <a class="nav__logo" href="#top" data-nav>
+      <span class="nav__logoWord">MAISON</span>
+      <span class="nav__logoSub" data-i18n="brand.perfumes">LUXURY PERFUMES</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#collection" data-nav data-i18n="nav.collection">Collection</a>
+      <a href="#philosophy" data-nav data-i18n="nav.story">Story</a>
+      <a href="#science"    data-nav data-i18n="nav.beauty">Beauty</a>
+      <a href="#journal"    data-nav data-i18n="nav.journal">Journal</a>
+    </nav>
+
+    <div class="nav__tools">
+      <div class="lang" id="lang">
+        <button class="lang__btn" id="langBtn" aria-haspopup="true" aria-expanded="false">
+          <span id="langCur">EN</span>
+          <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        </button>
+        <div class="lang__menu" id="langMenu" role="menu">
+          <button role="menuitem" data-lang="en" lang="en">English</button>
+          <button role="menuitem" data-lang="ar" lang="ar">العربية</button>
+          <button role="menuitem" data-lang="ku" lang="ku">کوردی</button>
+        </div>
+      </div>
+
+      <a class="nav__ig" href="https://www.instagram.com/maison.cosmetic/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor"/></svg>
+        <span class="u-sr" data-i18n="nav.instagram">Instagram</span>
+      </a>
+
+      <button class="nav__burger" id="burger" aria-expanded="false">
+        <span></span><span></span>
+        <span class="u-sr" data-i18n="nav.menu">Menu</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ MOBILE MENU ═══════════════ -->
+<div class="mmenu" id="mmenu" aria-hidden="true">
+  <nav class="mmenu__list">
+    <a href="#collection" data-nav><i>01</i><span data-i18n="nav.collection">Collection</span></a>
+    <a href="#philosophy" data-nav><i>02</i><span data-i18n="nav.story">Story</span></a>
+    <a href="#science"    data-nav><i>03</i><span data-i18n="nav.beauty">Beauty</span></a>
+    <a href="#journal"    data-nav><i>04</i><span data-i18n="nav.journal">Journal</span></a>
+  </nav>
+  <div class="mmenu__foot">
+    <div class="mmenu__langs">
+      <button data-lang="en">English</button><button data-lang="ar">العربية</button><button data-lang="ku">کوردی</button>
+    </div>
+    <a href="https://www.instagram.com/maison.cosmetic/" target="_blank" rel="noopener">@maison.cosmetic</a>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero" id="hero">
+  <canvas class="hero__atmos" id="atmos" aria-hidden="true"></canvas>
+
+  <div class="hero__split" aria-hidden="true"><i></i></div>
+
+  <div class="hero__stage">
+    <video class="hero__video" id="heroVideo" poster="assets/img/poster-flacon.jpg"
+           muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+    <picture class="hero__still" id="heroStill">
+      <source media="(max-width:600px)" srcset="assets/img/hero-sq-600.jpg 600w, assets/img/hero-sq-900.jpg 900w" sizes="100vw">
+      <img src="assets/img/hero-flacon-1920.jpg"
+           srcset="assets/img/hero-flacon-720.jpg 720w, assets/img/hero-flacon-1200.jpg 1200w, assets/img/hero-flacon-1920.jpg 1920w"
+           sizes="100vw" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+
+  <div class="hero__copy">
+    <p class="eyebrow" data-i18n="hero.eyebrow">Luxury Perfumes &amp; Cosmetic</p>
+    <h1 class="hero__title">
+      <span class="line"><span data-i18n="hero.title.a">The house of</span></span>
+      <span class="line"><em data-i18n="hero.title.b">scent and skin</em></span>
+    </h1>
+    <p class="hero__lede" data-i18n="hero.lede">Perfume, skincare and colour — chosen one piece at a time, and delivered across Kurdistan and Iraq.</p>
+    <div class="hero__cta">
+      <a class="btn btn--solid" href="#collection" data-nav data-magnetic><span data-i18n="hero.cta.primary">Explore the Collection</span></a>
+      <a class="btn btn--ghost" href="#intro" data-nav data-magnetic><span data-i18n="hero.cta.secondary">Discover Maison</span></a>
+    </div>
+  </div>
+
+  <div class="hero__meta">
+    <span class="hero__cap" data-i18n="hero.caption">Signature flacon — Maison Luxury Perfumes</span>
+    <span class="hero__scroll"><i></i><span data-i18n="hero.scroll">Scroll</span></span>
+  </div>
+</section>
+
+<!-- ═══════════════ 01 · INTRO ═══════════════ -->
+<section class="intro" id="intro">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal data-i18n="intro.label">01 — The Maison</p>
+    <h2 class="intro__title display" data-reveal data-split data-i18n="intro.title">Maison means house. Ours was built for beauty.</h2>
+    <div class="intro__grid">
+      <p class="intro__body" data-reveal data-i18n="intro.body">Two counters beneath one roof.</p>
+      <dl class="facts" data-reveal>
+        <div class="facts__row"><dt data-i18n="intro.stat1.k">Two houses</dt><dd data-i18n="intro.stat1.v">Perfume &amp; Cosmetic</dd></div>
+        <div class="facts__row"><dt data-i18n="intro.stat2.k">Curated in</dt><dd data-i18n="intro.stat2.v">Kurdistan</dd></div>
+        <div class="facts__row"><dt data-i18n="intro.stat3.k">Delivered across</dt><dd data-i18n="intro.stat3.v">Iraq</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 02 · FEATURED EDIT ═══════════════ -->
+<section class="edit" id="edit">
+  <div class="wrap">
+    <header class="secHead">
+      <p class="eyebrow" data-reveal data-i18n="featured.label">02 — The Edit</p>
+      <h2 class="secHead__title display" data-reveal data-split data-i18n="featured.title">Four objects we would put in your hands first.</h2>
+    </header>
+  </div>
+  <div class="edit__rail" id="editRail">
+    <article class="obj" data-tilt><div class="obj__frame obj__frame--red"><img src="assets/img/khair-oud-720.jpg" srcset="assets/img/khair-oud-720.jpg 720w, assets/img/khair-oud-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></div>
+      <div class="obj__meta"><h3 data-i18n="featured.1.name">Khair</h3><p data-i18n="featured.1.kind">Eau de Parfum</p></div></article>
+    <article class="obj" data-tilt><div class="obj__frame obj__frame--bone"><img src="assets/img/skincare-set-720.jpg" srcset="assets/img/skincare-set-720.jpg 720w, assets/img/skincare-set-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></div>
+      <div class="obj__meta"><h3 data-i18n="featured.2.name">The Serum</h3><p data-i18n="featured.2.kind">Vitamin C</p></div></article>
+    <article class="obj" data-tilt><div class="obj__frame obj__frame--bone"><img src="assets/img/texture-macro-720.jpg" srcset="assets/img/texture-macro-720.jpg 720w, assets/img/texture-macro-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></div>
+      <div class="obj__meta"><h3 data-i18n="featured.3.name">The Cream</h3><p data-i18n="featured.3.kind">Night Repair</p></div></article>
+    <article class="obj" data-tilt><div class="obj__frame obj__frame--red"><img src="assets/img/hair-oil-720.jpg" srcset="assets/img/hair-oil-720.jpg 720w, assets/img/hair-oil-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></div>
+      <div class="obj__meta"><h3 data-i18n="featured.4.name">The Hair Oil</h3><p data-i18n="featured.4.kind">Gloss &amp; Repair</p></div></article>
+  </div>
+  <div class="wrap"><p class="edit__hint" data-i18n="featured.hint">Drag or scroll</p></div>
+</section>
+
+<!-- ═══════════════ 03 · SIGNATURE (scroll-scrubbed 3D) ═══════════════ -->
+<section class="sig" id="signature">
+  <div class="sig__sticky">
+    <div class="sig__media">
+      <video class="sig__video" id="sigVideo" poster="assets/img/poster-khair.jpg"
+             muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <img class="sig__still" id="sigStill" src="assets/img/khair-oud-720.jpg" srcset="assets/img/khair-oud-720.jpg 720w, assets/img/khair-oud-1200.jpg 1200w" sizes="(max-width:1024px) 90vw, 45vw" alt="" aria-hidden="true" loading="lazy" decoding="async">
+    </div>
+    <div class="sig__copy">
+      <p class="eyebrow eyebrow--light" data-i18n="signature.label">03 — The Signature</p>
+      <p class="sig__name" data-i18n="signature.name">Khair</p>
+      <h2 class="sig__title display" data-i18n="signature.title">Oud, softened.</h2>
+      <p class="sig__body" data-i18n="signature.body">Oud can overwhelm a room.</p>
+      <div class="notes">
+        <span class="notes__label" data-i18n="signature.notes.label">Notes</span>
+        <ul class="notes__list">
+          <li data-i18n="signature.note.1">Oud</li><li data-i18n="signature.note.2">Davana</li><li data-i18n="signature.note.3">Pink Pepper</li>
+        </ul>
+      </div>
+      <a class="btn btn--gold" href="#collection" data-nav data-magnetic><span data-i18n="signature.cta">View Khair</span></a>
+    </div>
+    <div class="sig__progress" aria-hidden="true"><i id="sigBar"></i></div>
+  </div>
+</section>
+
+<!-- ═══════════════ 04 · BEAUTY SCIENCE ═══════════════ -->
+<section class="sci" id="science">
+  <div class="wrap">
+    <header class="secHead secHead--center">
+      <p class="eyebrow" data-reveal data-i18n="science.label">04 — Beauty, understood</p>
+      <h2 class="secHead__title display" data-reveal data-split data-i18n="science.title">We can tell you what is inside, and why it is there.</h2>
+      <p class="secHead__lede" data-reveal data-i18n="science.body">A counter is only as good as its advice.</p>
+    </header>
+    <ol class="sci__list">
+      <li class="sci__row" data-reveal>
+        <span class="sci__idx">01</span>
+        <h3 class="sci__name" data-i18n="science.1.name">Vitamin C</h3>
+        <p class="sci__role" data-i18n="science.1.role">Brightness</p>
+        <p class="sci__body" data-i18n="science.1.body">Evens tone.</p>
+        <span class="sci__orb sci__orb--c" aria-hidden="true"></span>
+      </li>
+      <li class="sci__row" data-reveal>
+        <span class="sci__idx">02</span>
+        <h3 class="sci__name" data-i18n="science.2.name">Hyaluronic</h3>
+        <p class="sci__role" data-i18n="science.2.role">Water</p>
+        <p class="sci__body" data-i18n="science.2.body">Holds water.</p>
+        <span class="sci__orb sci__orb--h" aria-hidden="true"></span>
+      </li>
+      <li class="sci__row" data-reveal>
+        <span class="sci__idx">03</span>
+        <h3 class="sci__name" data-i18n="science.3.name">Collagen</h3>
+        <p class="sci__role" data-i18n="science.3.role">Bounce</p>
+        <p class="sci__body" data-i18n="science.3.body">Supports the cushion.</p>
+        <span class="sci__orb sci__orb--o" aria-hidden="true"></span>
+      </li>
+      <li class="sci__row" data-reveal>
+        <span class="sci__idx">04</span>
+        <h3 class="sci__name" data-i18n="science.4.name">Urea</h3>
+        <p class="sci__role" data-i18n="science.4.role">Comfort</p>
+        <p class="sci__body" data-i18n="science.4.body">For skin that cracks.</p>
+        <span class="sci__orb sci__orb--u" aria-hidden="true"></span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════════ 05 · TEXTURE ═══════════════ -->
+<section class="tex" id="texture">
+  <div class="tex__bg"><img id="texImg" src="assets/img/texture-macro-1200.jpg" srcset="assets/img/texture-macro-720.jpg 720w, assets/img/texture-macro-1200.jpg 1200w, assets/img/texture-macro-1920.jpg 1920w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="tex__veil" aria-hidden="true"></div>
+  <div class="wrap tex__copy">
+    <p class="eyebrow eyebrow--light" data-reveal data-i18n="texture.label">05 — Texture</p>
+    <h2 class="tex__title display" data-reveal data-split data-i18n="texture.title">You know it before you read the box.</h2>
+    <ul class="tex__lines">
+      <li data-reveal data-i18n="texture.line.1">The weight of a cream.</li>
+      <li data-reveal data-i18n="texture.line.2">The slip of a serum.</li>
+      <li data-reveal data-i18n="texture.line.3">The cold of good glass.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 06 · PHILOSOPHY ═══════════════ -->
+<section class="phil" id="philosophy">
+  <div class="phil__media"><img id="philImg" src="assets/img/atelier-1200.jpg" srcset="assets/img/atelier-720.jpg 720w, assets/img/atelier-1200.jpg 1200w, assets/img/atelier-1920.jpg 1920w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
+  <div class="phil__panel">
+    <p class="eyebrow" data-reveal data-i18n="philosophy.label">06 — The Philosophy</p>
+    <h2 class="phil__title display" data-reveal data-split data-i18n="philosophy.title">We would rather carry fifty things well than five hundred badly.</h2>
+    <p class="phil__body" data-reveal data-i18n="philosophy.body">Everything on our shelves was opened.</p>
+    <p class="phil__sign" data-reveal data-i18n="philosophy.sign">— The Maison</p>
+  </div>
+</section>
+
+<!-- ═══════════════ 07 · COLLECTION ═══════════════ -->
+<section class="coll" id="collection">
+  <div class="wrap">
+    <header class="secHead">
+      <p class="eyebrow" data-reveal data-i18n="collection.label">07 — The Collection</p>
+      <h2 class="secHead__title display" data-reveal data-split data-i18n="collection.title">Four counters. Start where you like.</h2>
+    </header>
+    <div class="coll__grid">
+      <a class="cell cell--tall" href="#" data-soon data-reveal data-tilt>
+        <span class="cell__img"><img src="assets/img/khair-oud-720.jpg" srcset="assets/img/khair-oud-720.jpg 720w, assets/img/khair-oud-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></span>
+        <span class="cell__body">
+          <span class="cell__name" data-i18n="collection.1.name">Perfume</span>
+          <span class="cell__desc" data-i18n="collection.1.desc">Oud, amber and the quiet florals.</span>
+          <span class="cell__go" data-i18n="collection.view">View</span>
+        </span>
+      </a>
+      <a class="cell" href="#" data-soon data-reveal data-tilt>
+        <span class="cell__img"><img src="assets/img/skincare-set-720.jpg" srcset="assets/img/skincare-set-720.jpg 720w, assets/img/skincare-set-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></span>
+        <span class="cell__body">
+          <span class="cell__name" data-i18n="collection.2.name">Skincare</span>
+          <span class="cell__desc" data-i18n="collection.2.desc">Cleanse, treat, protect.</span>
+          <span class="cell__go" data-i18n="collection.view">View</span>
+        </span>
+      </a>
+      <a class="cell" href="#" data-soon data-reveal data-tilt>
+        <span class="cell__img"><img src="assets/img/texture-macro-720.jpg" srcset="assets/img/texture-macro-720.jpg 720w, assets/img/texture-macro-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></span>
+        <span class="cell__body">
+          <span class="cell__name" data-i18n="collection.3.name">Cosmetic</span>
+          <span class="cell__desc" data-i18n="collection.3.desc">Colour that behaves in our climate.</span>
+          <span class="cell__go" data-i18n="collection.view">View</span>
+        </span>
+      </a>
+      <a class="cell cell--wide" href="#" data-soon data-reveal data-tilt>
+        <span class="cell__img"><img src="assets/img/hair-oil-720.jpg" srcset="assets/img/hair-oil-720.jpg 720w, assets/img/hair-oil-1200.jpg 1200w" sizes="(max-width:560px) 86vw, (max-width:1024px) 46vw, 30vw" alt="" loading="lazy" decoding="async"></span>
+        <span class="cell__body">
+          <span class="cell__name" data-i18n="collection.4.name">Hair</span>
+          <span class="cell__desc" data-i18n="collection.4.desc">Oils, masks and repair.</span>
+          <span class="cell__go" data-i18n="collection.view">View</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 08 · THE COUNTER ═══════════════ -->
+<section class="proof" id="proof">
+  <div class="wrap proof__inner">
+    <div class="proof__l">
+      <p class="eyebrow eyebrow--light" data-reveal data-i18n="proof.label">08 — The Counter</p>
+      <h2 class="proof__title display" data-reveal data-split data-i18n="proof.title">Most of Maison happens on Instagram.</h2>
+      <p class="proof__body" data-reveal data-i18n="proof.body">New arrivals, prices and honest answers.</p>
+      <a class="btn btn--solid" href="https://www.instagram.com/maison.cosmetic/" target="_blank" rel="noopener" data-magnetic><span data-i18n="proof.cta">Open Instagram</span></a>
+    </div>
+    <dl class="proof__facts" data-reveal>
+      <div><dt data-i18n="proof.1.k">Follow</dt><dd data-i18n="proof.1.v">@maison.cosmetic</dd></div>
+      <div><dt data-i18n="proof.2.k">Languages</dt><dd data-i18n="proof.2.v">Kurdish · Arabic · English</dd></div>
+      <div><dt data-i18n="proof.3.k">Delivery</dt><dd data-i18n="proof.3.v">Kurdistan &amp; Iraq</dd></div>
+      <div><dt data-i18n="proof.4.k">Also</dt><dd data-i18n="proof.4.v">Wholesale available</dd></div>
+    </dl>
+  </div>
+  <p class="proof__note wrap" data-i18n="proof.note">Product names, prices and editorial copy on this page are design placeholders.</p>
+</section>
+
+<!-- ═══════════════ 09 · JOURNAL ═══════════════ -->
+<section class="jour" id="journal">
+  <div class="wrap">
+    <header class="secHead">
+      <p class="eyebrow" data-reveal data-i18n="journal.label">09 — Journal</p>
+      <h2 class="secHead__title display" data-reveal data-split data-i18n="journal.title">What we are reading at the counter.</h2>
+    </header>
+    <ul class="jour__list">
+      <li data-reveal><a href="#" data-soon>
+        <span class="jour__kick" data-i18n="journal.1.kicker">Perfume</span>
+        <span class="jour__title" data-i18n="journal.1.title">How to wear oud in summer heat</span>
+        <span class="jour__go" data-i18n="journal.read">Read</span></a></li>
+      <li data-reveal><a href="#" data-soon>
+        <span class="jour__kick" data-i18n="journal.2.kicker">Skincare</span>
+        <span class="jour__title" data-i18n="journal.2.title">The order your serums actually want</span>
+        <span class="jour__go" data-i18n="journal.read">Read</span></a></li>
+      <li data-reveal><a href="#" data-soon>
+        <span class="jour__kick" data-i18n="journal.3.kicker">Maison</span>
+        <span class="jour__title" data-i18n="journal.3.title">Why we open every box before you do</span>
+        <span class="jour__go" data-i18n="journal.read">Read</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 10 · FINAL CTA ═══════════════ -->
+<section class="final" id="final">
+  <video class="final__video" id="finVideo" poster="assets/img/poster-skincare.jpg"
+         muted playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+  <div class="final__veil" aria-hidden="true"></div>
+  <div class="wrap final__copy">
+    <h2 class="final__title display">
+      <span class="line" data-i18n="final.title.a">Come in.</span>
+      <span class="line"><em data-i18n="final.title.b">The door is open.</em></span>
+    </h2>
+    <a class="btn btn--solid btn--lg" href="https://www.instagram.com/maison.cosmetic/" target="_blank" rel="noopener" data-magnetic><span data-i18n="final.cta">Discover Maison Cosmetic</span></a>
+    <p class="final__sub" data-i18n="final.sub">Kurdistan and Iraq — retail and wholesale.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="foot">
+  <div class="wrap foot__top">
+    <a class="foot__logo" href="#top" data-nav>
+      <span>MAISON</span><i data-i18n="brand.cosmetic">COSMETIC</i>
+    </a>
+    <div class="foot__cols">
+      <div><h4 data-i18n="footer.explore">Explore</h4>
+        <a href="#collection" data-nav data-i18n="nav.collection">Collection</a>
+        <a href="#science"    data-nav data-i18n="nav.beauty">Beauty</a>
+        <a href="#journal"    data-nav data-i18n="nav.journal">Journal</a></div>
+      <div><h4 data-i18n="footer.house">The House</h4>
+        <a href="#philosophy" data-nav data-i18n="footer.about">About Maison</a>
+        <a href="#proof" data-nav data-i18n="footer.wholesale">Wholesale</a>
+        <a href="#proof" data-nav data-i18n="footer.delivery">Delivery</a></div>
+      <div><h4 data-i18n="footer.connect">Connect</h4>
+        <a href="https://www.instagram.com/maison.cosmetic/" target="_blank" rel="noopener">@maison.cosmetic</a>
+        <a href="#proof" data-nav data-i18n="footer.contact">Contact</a></div>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>© <span id="yr">2026</span> Maison. <span data-i18n="footer.rights">All rights reserved.</span></span>
+    <span data-i18n="footer.design">Design concept — not an operating store.</span>
+  </div>
+</footer>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/scene.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
