@@ -1,0 +1,51 @@
+/* ==========================================================================
+   MAISON — standalone pages (products, ingredients, locations)
+
+   These pages are crawled and read without app.js, so nothing in here may
+   depend on a class the scripts add at runtime. Tokens and primitives come
+   from maison.css; this file only adds the few shapes those pages need.
+   ========================================================================== */
+
+.page{ padding-block:calc(var(--navh) + var(--s8)) var(--s10); }
+.page__head{ margin-block-end:var(--s9); }
+.page__title{ font-size:var(--t-h2); max-width:20ch; }
+.page__lede{ font-size:var(--t-lede); color:var(--fg-2); max-width:56ch;
+  margin-block-start:var(--s5); }
+.page__acts{ display:flex; gap:var(--s4); flex-wrap:wrap; margin-block-start:var(--s7); }
+
+/* price sits under the description in the last column of a .sci__row */
+.sci__price{ font-family:var(--f-display); font-size:var(--t-h3); color:var(--gold-lt);
+  margin-block-start:var(--s2); }
+.sci__price small{ font-family:var(--f-ui); font-size:.62rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--fg-3); margin-inline-start:6px; }
+html[data-font="arabic"] .sci__price small{ letter-spacing:0; text-transform:none; font-size:.7rem; }
+
+/* a single record, shown above the index when the page is opened with ?id= */
+.detail{ padding:var(--s7) 0 var(--s8); border-block-end:1px solid var(--line);
+  margin-block-end:var(--s9); }
+.detail__name{ font-family:var(--f-display); font-size:var(--t-h2); font-weight:300;
+  line-height:1.04; letter-spacing:-.018em; }
+.detail__kind{ font-size:var(--t-label); letter-spacing:.2em; text-transform:uppercase;
+  color:var(--red); margin-block-start:var(--s3); }
+html[data-font="arabic"] .detail__kind{ letter-spacing:.03em; text-transform:none; font-size:.78rem; }
+.detail__body{ font-size:var(--t-lede); color:var(--fg-2); max-width:52ch;
+  margin-block-start:var(--s5); }
+.detail__media{ margin-block-start:var(--s6); max-width:32rem;
+  border-radius:var(--r-md); overflow:hidden; }
+.detail__acts{ display:flex; gap:var(--s4); flex-wrap:wrap; margin-block-start:var(--s6); }
+
+/* a second block of copy further down a page */
+.page__sec{ margin-block-start:var(--s9); }
+.page .map{ max-width:52rem; margin-block-start:var(--s6); }
+
+/* delivery table on the locations page */
+.zones{ display:grid; border-block-start:1px solid var(--line); max-width:36rem; }
+.zones__row{ display:flex; justify-content:space-between; gap:var(--s5); align-items:baseline;
+  padding-block:var(--s4); border-block-end:1px solid var(--line); }
+.zones__row dt{ color:var(--fg-2); }
+.zones__row dd{ font-family:var(--f-display); font-size:var(--t-h3); }
+
+@media (max-width:760px){
+  .page{ padding-block:calc(var(--navh) + var(--s6)) var(--s9); }
+  .page__head{ margin-block-end:var(--s7); }
+}
